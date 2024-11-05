@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// This is the command to generate a new migration
+// 1. npx prisma generate
+// 2. npx prisma migrate dev --name <ADD A NAME FOR YOUR MIGRATION>
+
+// prisma studio
+// npx prisma studio
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  name              String?
+  roleId            Int        @default(1)
+  role              Role       @relation(fields: [roleId], references: [id])
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  purchasedProduct  Boolean    @default(false)
+  purchasedAt       DateTime?
+  stripeCustomerId  String?
+  submissions       Resource[] 
+  favorites         Favorite[] 
+
+  @@index([roleId])
+}
+
+model Resource {
+  id                     Int      @id @default(autoincrement())
+  totalViews             Int      @default(0)
+  totalFollowers         Int      @default(0)
+  initialSubscriberCount Int      @default(0)
+  creatorName            String
+  postingDate            DateTime
+  tags                   String?
+  contentLink            String
+  contentDescription     String?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  userId                 String
+  platformId             Int
+  orientationId          Int
+  editingStyleId         Int
+  categoryId             Int
+  durationId             Int
+  languageId             Int
+
+  user                   User         @relation(fields: [userId], references: [id])
+  platform               Platform     @relation(fields: [platformId], references: [id])
+  orientation            Orientation  @relation(fields: [orientationId], references: [id])
+  editingStyle           EditingStyle @relation(fields: [editingStyleId], references: [id])
+  category               Category     @relation(fields: [categoryId], references: [id])
+  duration               Duration     @relation(fields: [durationId], references: [id])
+  language               Language     @relation(fields: [languageId], references: [id])
+  favoritedBy            Favorite[]  
+}
+
+model Favorite {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  resourceId Int
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  @@unique([userId, resourceId])
+}
+
+model Platform {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  createdAt  DateTime   @default(now())
+  resources  Resource[]
+}
+
+model Orientation {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  createdAt  DateTime   @default(now())
+  resources  Resource[]
+}
+
+model EditingStyle {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  createdAt  DateTime   @default(now())
+  resources  Resource[]
+}
+
+model Category {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  createdAt  DateTime   @default(now())
+  resources  Resource[]
+}
+
+model Duration {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  createdAt  DateTime   @default(now())
+  resources  Resource[]
+}
+
+model Language {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  createdAt  DateTime   @default(now())
+  resources  Resource[]
+}
