@@ -20,13 +20,7 @@ export async function POST(request: NextRequest) {
       firstName: name || undefined,
     })
 
-    // 2. Create session token for automatic sign-in
-    const sessionToken = await clerk.signInTokens.createSignInToken({
-      userId: newUser.id,
-      expiresInSeconds: 3600, // 1 hour
-    })
-
-    // 3. Create user in our database
+    // 2. Create user in our database
     await prisma.user.create({
       data: {
         id: newUser.id,
@@ -38,14 +32,12 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // 4. Create login URL for automatic sign-in
-    const loginUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/v1/session/new?session_token=${sessionToken.token}`
-
+    // Instead of creating a session token, return data for client-side sign-in
     return NextResponse.json({
       success: true,
       userId: newUser.id,
-      loginUrl,
-      sessionToken: sessionToken.token,
+      email,
+      password, // We'll use this for immediate sign-in
     })
   } catch (error) {
     console.error("Signup error:", error)

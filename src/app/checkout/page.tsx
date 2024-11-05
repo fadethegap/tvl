@@ -10,10 +10,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useSignIn } from "@clerk/nextjs"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!)
 
 function CheckoutForm() {
+  const { signIn } = useSignIn()
   const stripe = useStripe()
   const elements = useElements()
   const router = useRouter()
@@ -23,7 +25,7 @@ function CheckoutForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [customerId, setCustomerId] = useState<string | null>(null)
+  const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,7 +55,7 @@ function CheckoutForm() {
         return
       }
 
-      // 2. Create payment intent first to get customer ID
+      // 2. Create payment intent and get customer ID
       const intentResponse = await fetch("/api/stripe/create-payment-intent", {
         method: "POST",
         headers: {
@@ -64,7 +66,11 @@ function CheckoutForm() {
         }),
       })
 
-      const { customerId: stripeCustomerId } = await intentResponse.json()
+      const { clientSecret, customerId } = await intentResponse.json()
+
+      if (!customerId) {
+        throw new Error("Failed to create customer")
+      }
 
       // 3. Process payment
       const { error: stripeError, paymentIntent } = await stripe.confirmPayment(
@@ -89,7 +95,7 @@ function CheckoutForm() {
             email,
             password,
             name,
-            stripeCustomerId,
+            stripeCustomerId: customerId,
           }),
         })
 
@@ -99,11 +105,21 @@ function CheckoutForm() {
           throw new Error(data.error || "Failed to create user")
         }
 
-        // 5. Handle automatic sign-in with Clerk's session token
-        if (data.loginUrl) {
-          window.location.href = data.loginUrl
-        } else {
-          router.push("/dashboard")
+        // 5. Sign in the user immediately using Clerk
+        try {
+          const result = await signIn?.create({
+            identifier: email,
+            password,
+          })
+
+          if (result?.status === "complete") {
+            router.push("/dashboard")
+          } else {
+            throw new Error("Failed to sign in")
+          }
+        } catch (signInError) {
+          console.error("Sign in error:", signInError)
+          router.push("/sign-in")
         }
       }
     } catch (err) {
