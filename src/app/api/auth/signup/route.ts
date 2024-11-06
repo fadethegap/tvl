@@ -1,6 +1,6 @@
 // app/api/auth/signup/route.ts
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/db/prisma"
 import { clerkClient } from "@clerk/nextjs/server"
 
 async function getClerkClient() {
