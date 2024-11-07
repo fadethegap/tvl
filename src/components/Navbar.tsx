@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { UserButton } from "@clerk/nextjs"
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useTheme } from "next-themes"
@@ -34,7 +34,12 @@ export default function Navbar() {
               </Button>
             </Link>
             <ThemeToggle />
-            <UserButton afterSignOutUrl="/" />
+            <SignedOut>
+              <SignInButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </div>
         </div>
       </div>

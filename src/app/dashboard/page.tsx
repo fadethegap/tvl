@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
+    <div className="max-w-4xl mx-auto p-8 h-screen">
       <h1 className="text-2xl font-bold mb-4">Welcome to Your Dashboard</h1>
       <p>Thank you for your purchase!</p>
     </div>
