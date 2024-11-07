@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import { FilterProvider } from "@/contexts/FilterContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -39,7 +40,14 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navbar />
-            <main>{children}</main>
+            <FilterProvider>
+              <div className="flex min-h-screen">
+                <aside className="w-64 fixed top-[64px] bottom-0 left-0 overflow-y-auto border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                  {/* Sidebar content will go here */}
+                </aside>
+                <main className="flex-1 ml-64">{children}</main>
+              </div>
+            </FilterProvider>
             <ToastContainer
               theme="dark"
               position="bottom-right"

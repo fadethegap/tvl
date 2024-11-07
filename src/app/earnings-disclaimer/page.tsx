@@ -1,3 +1,5 @@
+"use client"
+
 export default function EarningsDisclaimer() {
   return (
     <div className="relative overflow-hidden bg-white py-16">

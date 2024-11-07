@@ -1,3 +1,13 @@
+
+
+// npx prisma generate
+// npx prisma migrate dev --name <migration_name>
+
+
+
+
+
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,6 +39,8 @@ model User {
   favorites        Favorite[]
   submissions      Resource[]
   role             Role       @relation(fields: [roleId], references: [id])
+  submittedResources Resource[] @relation("SubmittedResources")
+  approvedResources  Resource[] @relation("ApprovedResources")
 
   @@index([roleId])
 }
@@ -52,6 +64,12 @@ model Resource {
   categoryId             Int
   durationId             Int
   languageId             Int
+  status        String     @default("pending") // "pending", "approved", "rejected"
+  approvedAt    DateTime?
+  approvedById  String?    // ID of admin/staff_admin who approved
+  approvedBy    User?      @relation("ApprovedResources", fields: [approvedById], references: [id])
+  submittedById String     // ID of user who submitted
+  submittedBy   User       @relation("SubmittedResources", fields: [submittedById], references: [id])
   favoritedBy            Favorite[]
   category               Category     @relation(fields: [categoryId], references: [id])
   duration               Duration     @relation(fields: [durationId], references: [id])
@@ -60,6 +78,10 @@ model Resource {
   orientation            Orientation  @relation(fields: [orientationId], references: [id])
   platform               Platform     @relation(fields: [platformId], references: [id])
   user                   User         @relation(fields: [userId], references: [id])
+
+  @@index([status])
+  @@index([submittedById])
+  @@index([approvedById])
 }
 
 model Favorite {

@@ -1,3 +1,5 @@
+"use client"
+
 export default function TermsOfService() {
   return (
     <div className="relative overflow-hidden bg-white py-16">

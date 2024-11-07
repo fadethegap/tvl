@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { showToast } from "@/lib/toastUtils"
+import { showToast } from "@/lib/utils/toastUtils"
 
 const languageSchema = z.object({
   name: z.string().min(2, {

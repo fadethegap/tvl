@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { showToast } from "../../lib/toastUtils"
+import { showToast } from "../../lib/utils/toastUtils"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 // Zod schema for form validation
